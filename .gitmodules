@@ -1,0 +1,3 @@
+[submodule "thrift/lua-compat-5.2"]
+	path = thrift/lua-compat-5.2
+	url = https://github.com/hishamhm/lua-compat-5.2.git
