@@ -3,4 +3,5 @@
 *.o
 *.a
 *.gz
+*.swp
 thrift/lua-5.1.5/
