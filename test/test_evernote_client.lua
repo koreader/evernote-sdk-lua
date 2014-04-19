@@ -4,16 +4,24 @@ package.cpath = package.cpath .. ";../thrift/lib/?.so"
 
 local inspect = require("inspect")
 local EvernoteClient = require("EvernoteClient")
+local EvernoteOAuth = require("EvernoteOAuth")
 
-local authToken = '********************************************************'
+local authToken = nil
+local username = ""
+local password = ""
 local userStoreUri = 'https://sandbox.evernote.com/edam/user'
 local noteStoreUri = 'https://sandbox.evernote.com/shard/s1/notestore'
 
 describe("EvernoteClient API", function()
   it("should be created", function()
+    local oauth = EvernoteOAuth:new{
+      sandbox = true,
+      username = username,
+      password = password,
+    }
     client = EvernoteClient:new{
       sandbox = true,
-      authToken = authToken,
+      authToken = authToken or oauth:getToken(),
       userStoreUri = userStoreUri,
       noteStoreUri = noteStoreUri
     }
