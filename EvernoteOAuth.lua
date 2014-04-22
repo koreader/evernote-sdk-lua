@@ -5,7 +5,6 @@ local url = require('socket.url')
 local http = require('socket.http')
 local https = require('ssl.https')
 local ltn12 = require('ltn12')
-local config = require('EvernoteConfig')
 --local inspect = require('inspect')
 
 --[[
@@ -97,7 +96,7 @@ local function uuid4()
 end
 
 local OAuth = {
-  sandbox,
+  domain,
   username,
   password,
   code,
@@ -139,14 +138,27 @@ function OAuth:new(o)
   o = o or {}
   setmetatable(o, self)
   self.__index = self
+  if o.init then o:init() end
   return o
 end
 
+function OAuth:init()
+  local config = require('EvernoteConfig')
+  if self.domain then
+    self.baseUrl = config["BASE_URL_"..self.domain:upper()]
+    self.consumer_key = config["CONSUMER_KEY_"..self.domain:upper()]
+    self.signature = config["CONSUMER_SECRET_"..self.domain:upper()]
+  else
+    self.baseUrl = config.BASE_URL
+    self.consumer_key = config.CONSUMER_KEY
+    self.signature = config.CONSUMER_SECRET
+  end
+end
+
 function OAuth:getTokenQueryData(args)
-  local C = config
   local data = {
-    oauth_consumer_key = self.sandbox and C.CONSUMER_KEY_SANDBOX or C.CONSUMER_KEY,
-    oauth_signature = self.sandbox and C.CONSUMER_SECRET_SANDBOX or C.CONSUMER_SECRET,
+    oauth_consumer_key = self.consumer_key,
+    oauth_signature = self.signature,
     oauth_signature_method = 'PLAINTEXT',
     oauth_timestamp = tostring(os.time()),
     oauth_nonce = uuid4()
@@ -217,7 +229,6 @@ function OAuth:parseResponse(content)
 end
 
 function OAuth:getTmpOAuthToken()
-  self.baseUrl = self.sandbox and config.BASE_URL_SANDBOX or config.BASE_URL
   local code, _, content = self:loadPage(
           "GET", self.urlPath['token'], nil,
           self:getTokenQueryData({ oauth_callback = self.baseUrl }))

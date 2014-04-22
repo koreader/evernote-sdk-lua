@@ -11,12 +11,9 @@ local dtd = '<?xml version="1.0" encoding="UTF-8"?>' ..
 
 EvernoteClient = __TObject:new{
   __type = "EvernoteClient",
-  sandbox = false,
-  consumerKey,
-  consumerSecret,
-  userStoreUri,
-  noteStoreUri,
+  domain,
   authToken,
+
   userStore,
   noteStore,
 }
@@ -24,6 +21,12 @@ EvernoteClient = __TObject:new{
 function EvernoteClient:getUserStore()
   if self.userStore then return self.userStore end
 
+  local config = require('EvernoteConfig')
+  if self.domain then
+    self.userStoreUri = config["USER_STORE_URL_"..self.domain:upper()]
+  else
+    self.userStoreUri = config.USER_STORE_URL
+  end
   local userStoreHttpClient = THttpClient:new{ uri = self.userStoreUri }
   local userStoreProtocol = TBinaryProtocol:new{ trans = userStoreHttpClient }
   self.userStore = UserStoreClient:new{ iprot = userStoreProtocol }
@@ -34,9 +37,7 @@ end
 function EvernoteClient:getNoteStore()
   if self.noteStore then return self.noteStore end
 
-  if not self.sandbox then
-    self.noteStoreUri = self:getUserStore():getNoteStoreUrl(self.authToken)
-  end
+  self.noteStoreUri = self:getUserStore():getNoteStoreUrl(self.authToken)
   local noteStoreHttpClient = THttpClient:new{ uri = self.noteStoreUri }
   local noteStoreProtocol = TBinaryProtocol:new{ trans = noteStoreHttpClient }
   self.noteStore = NoteStoreClient:new{ iprot = noteStoreProtocol }

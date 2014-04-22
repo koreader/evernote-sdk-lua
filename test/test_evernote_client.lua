@@ -9,21 +9,17 @@ local EvernoteOAuth = require("EvernoteOAuth")
 local authToken = nil
 local username = ""
 local password = ""
-local userStoreUri = 'https://sandbox.evernote.com/edam/user'
-local noteStoreUri = 'https://sandbox.evernote.com/shard/s1/notestore'
 
 describe("EvernoteClient API", function()
   it("should be created", function()
     local oauth = EvernoteOAuth:new{
-      sandbox = true,
+      domain = "sandbox",
       username = username,
       password = password,
     }
     client = EvernoteClient:new{
-      sandbox = true,
+      domain = "sandbox",
       authToken = authToken or oauth:getToken(),
-      userStoreUri = userStoreUri,
-      noteStoreUri = noteStoreUri
     }
     assert.is_not_nil(client)
   end)
@@ -42,10 +38,14 @@ describe("EvernoteClient API", function()
   it("should list notebooks", function()
     notebooks = client:findNotebooks()
   end)
+  local notebook_name = "lua's notebook"
+  local notebook_new_name = "luna's notebook"
   it("should create notebook", function()
-    local notebook_name = "lua's notebook"
     for i=1, #notebooks do
       if notebooks[i].name == notebook_name then
+        assert.truthy(client:removeNotebook(notebooks[i].guid))
+      end
+      if notebooks[i].name == notebook_new_name then
         assert.truthy(client:removeNotebook(notebooks[i].guid))
       end
     end
@@ -54,11 +54,10 @@ describe("EvernoteClient API", function()
     assert.are.same(notebook.name, notebook_name)
   end)
   it("should modify notebook name", function()
-    local new_name = "luna's notebook"
-    assert.truthy(client:updateNotebook(notebook.guid, new_name))
+    assert.truthy(client:updateNotebook(notebook.guid, notebook_new_name))
   end)
   it("should find notebook by title", function()
-    local guid = client:findNotebookByTitle("luna's notebook")
+    local guid = client:findNotebookByTitle(notebook_new_name)
     assert.are.same(guid, notebook.guid)
     assert.are.same(client:findNotebookByTitle("non-exsitent-title"), nil)
   end)
@@ -81,7 +80,8 @@ describe("EvernoteClient API", function()
     assert.truthy(client:removeNote(note.guid))
   end)
   it("should delete notebook", function()
-    assert.truthy(client:removeNotebook(notebook.guid))
+    -- deleting notebook is only allowed in sandbox
+    --assert.truthy(client:removeNotebook(notebook.guid))
   end)
 end)
 

@@ -10,7 +10,7 @@ local password = ""
 describe("Evernote OAuth", function()
   it("should be created", function()
     oauth = EvernoteOAuth:new{
-      sandbox = true,
+      domain = "sandbox",
       username = username,
       password = password,
     }
