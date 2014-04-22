@@ -23,7 +23,7 @@ local url = require("socket.url")
 local http = require('socket.http')
 local https = require('ssl.https')
 local ltn12 = require("ltn12")
-local inspect = require('inspect')
+--local inspect = require('inspect')
 
 -- THttpBase
 THttpBase = TTransportBase:new{
