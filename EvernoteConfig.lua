@@ -9,8 +9,8 @@ EvernoteConfig.CONSUMER_SECRET = "c0f923319afb8e90"
 
 EvernoteConfig.BASE_URL_YINXIANG = "https://app.yinxiang.com"
 EvernoteConfig.USER_STORE_URL_YINXIANG = "https://app.yinxiang.com/edam/user"
-EvernoteConfig.CONSUMER_KEY_YINXIANG = "koreader-1862"
-EvernoteConfig.CONSUMER_SECRET_YINXIANG = "950ac198246fbaee"
+EvernoteConfig.CONSUMER_KEY_YINXIANG = "koreader-0563"
+EvernoteConfig.CONSUMER_SECRET_YINXIANG = "c0f923319afb8e90"
 
 EvernoteConfig.BASE_URL_SANDBOX = "https://sandbox.evernote.com"
 EvernoteConfig.USER_STORE_URL_SANDBOX = "https://sandbox.evernote.com/edam/user"
