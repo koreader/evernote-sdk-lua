@@ -132,14 +132,41 @@ function EvernoteClient:findNoteByTitle(title, notebook)
   end
 end
 
-function EvernoteClient:enmlify(content)
+local function enmlify(content)
   return dtd..'<en-note>'..content..'</en-note>'
 end
 
-function EvernoteClient:createNote(title, content, tags, notebook, created)
+local function hextobin(s)
+	return (s:gsub('(%x%x)', function(hex)
+		return string.char(tonumber(hex, 16))
+	end))
+end
+
+local function createImageResources(resources)
+  local res = {}
+  for _, resource in ipairs(resources or {}) do
+    local image = resource.image
+    if image then
+      local data = Data:new{
+        size = #image.png,
+        bodyhash = hextobin(image.hash),
+        body = image.png
+      }
+      local resource = Resource:new{
+        mime = "image/png",
+        data = data
+      }
+      table.insert(res, resource)
+    end
+  end
+  return res
+end
+
+function EvernoteClient:createNote(title, content, resources, tags, notebook, created)
   local note = Note:new{
     title = title,
-    content = self:enmlify(content),
+    content = enmlify(content),
+    resources = createImageResources(resources),
     created = created,
     tagNames = tags,
     notebookGuid = notebook,
@@ -147,11 +174,12 @@ function EvernoteClient:createNote(title, content, tags, notebook, created)
   return self:getNoteStore():createNote(self.authToken, note)
 end
 
-function EvernoteClient:updateNote(guid, title, content, tags, notebook)
+function EvernoteClient:updateNote(guid, title, content, resources, tags, notebook)
   local note = Note:new{
     guid = guid,
     title = title,
-    content = self:enmlify(content),
+    content = enmlify(content),
+    resources = createImageResources(resources),
     tagNames = tags,
     notebookGuid = notebook,
   }
