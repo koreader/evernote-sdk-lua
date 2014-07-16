@@ -203,6 +203,11 @@ function OAuth:loadPage(method, path, params, data)
   local httpRequest = parsed.scheme == 'http' and http.request or https.request
   local code, headers, status = socket.skip(1, httpRequest(request))
 
+  -- raise error message when network is unavailable
+  if headers == nil then
+    error("Network is unreachable")
+  end
+
   -- Update cookies
   local cookies = split_set_cookie(headers['set-cookie'] or "")
   for lk,lv in pairs(cookies) do

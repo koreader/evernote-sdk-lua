@@ -127,6 +127,12 @@ function THttpClient:flush()
   else
     self.code, self.headers, self.status = socket.skip(1, https.request(self.request))
   end
+
+  -- raise error message when network is unavailable
+  if self.headers == nil then
+    terror(TTransportException:new{errorCode = TTransportException.NOT_OPEN})
+  end
+
   --print('sink', inspect(self.sink))
   --print('code:', self.code)
   --print('headers:', inspect(self.headers))
