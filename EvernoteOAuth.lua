@@ -72,13 +72,13 @@ local _empty = {}
 local function build_cookies(cookies)
     s = ""
     for i,v in ipairs(cookies or _empty) do
-        if v.name then
+        if v.name and v.name ~= "$last" then
             s = s .. v.name
             if v.value and v.value ~= "" then
                 s = s .. '=' .. quote(v.value)
             end
+            s = s .. "; "
         end
-        if v.name then s = s .. "; " end
     end
     return s
 end
