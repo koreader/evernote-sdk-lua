@@ -185,6 +185,7 @@ function OAuth:loadPage(method, path, params, data)
   parsed.path = path
   parsed.params = params
   parsed.query = method == "GET" and query or nil
+  parsed.protocol = "sslv23"
 
   -- Write headers
   headers['cookie'] = build_cookies(self.cookies)
@@ -200,12 +201,13 @@ function OAuth:loadPage(method, path, params, data)
   request['sink'] = ltn12.sink.table(sink)
   request['headers'] = headers
 
+  http.TIMEOUT, https.TIMEOUT = 10, 10
   local httpRequest = parsed.scheme == 'http' and http.request or https.request
   local code, headers, status = socket.skip(1, httpRequest(request))
 
-  -- raise error message when network is unavailable
-  if headers == nil then
-    error("Network is unreachable")
+  -- raise error message when page cannot be loaded
+  if headers == nil and code then
+    error(code)
   end
 
   -- Update cookies

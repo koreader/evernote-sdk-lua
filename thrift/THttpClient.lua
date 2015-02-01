@@ -52,7 +52,7 @@ THttpClient = THttpBase:new{
   --offset = 1,
   ssl_params = {
     mode = 'client',
-    protocol = 'tlsv1',
+    protocol = 'sslv23',
     verify = 'peer',
     options = 'all',
   },
