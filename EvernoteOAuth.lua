@@ -284,7 +284,7 @@ function OAuth:handleTwoFactor()
 end
 
 function OAuth:login()
-  local code, _, _ = self:loadPage("GET", self.urlPath['login'], nil,
+  local code, _, response = self:loadPage("GET", self.urlPath['login'], nil,
           { oauth_token = self.tmpOAuthToken })
 
   if code ~= 200 then
@@ -300,6 +300,8 @@ function OAuth:login()
   self.postData['login']['username'] = self.username
   self.postData['login']['password'] = self.password
   self.postData['login']['targetUrl'] = target_url
+  self.postData['login']['hpts'] = response:match('"hpts":"(.-)"')
+  self.postData['login']['hptsh'] = response:match('"hptsh":"(.-)"')
   local code, loc, content = self:loadPage("POST",
           self.urlPath['login'], "jsessionid="..self.jsessionid,
           self.postData['login'])
