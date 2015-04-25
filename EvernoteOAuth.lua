@@ -300,8 +300,8 @@ function OAuth:login()
   self.postData['login']['username'] = self.username
   self.postData['login']['password'] = self.password
   self.postData['login']['targetUrl'] = target_url
-  self.postData['login']['hpts'] = response:match('"hpts":"(.-)"')
-  self.postData['login']['hptsh'] = response:match('"hptsh":"(.-)"')
+  self.postData['login']['hpts'] = response:match('%("hpts"%)%.value.-"(.-)"')
+  self.postData['login']['hptsh'] = response:match('%("hptsh"%)%.value.-"(.-)"')
   local code, loc, content = self:loadPage("POST",
           self.urlPath['login'], "jsessionid="..self.jsessionid,
           self.postData['login'])
