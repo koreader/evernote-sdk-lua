@@ -327,9 +327,17 @@ function OAuth:login()
   return true
 end
 
+function OAuth:_getCsrfToken()
+  local code, _, content = self:loadPage("GET",
+          self.urlPath['access'], nil, {oauth_token = self.tmpOAuthToken})
+  return content
+end
+
 function OAuth:allowAccess()
+  local content = self:_getCsrfToken()
   self.postData.access.oauth_token = self.tmpOAuthToken
   self.postData.access.oauth_callback = self.baseUrl
+  self.postData.access.csrfBusterToken = content:match('"csrfBusterToken" value="(.-)"')
   local code, loc, content = self:loadPage(
           "POST", self.urlPath['access'], nil, self.postData.access)
 
