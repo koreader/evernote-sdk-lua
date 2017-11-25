@@ -9,8 +9,7 @@ COMPAT_DIR=lua-compat-5.2
 SRCS=$(wildcard $(SRC_DIR)/*.c)
 OBJS=$(SRCS:%.c=%.o)
 
-CFLAGS=-I$(LUA_DIR)/src -I$(COMPAT_DIR)/c-api \
-       -L$(OUTPUT_DIR) -shared -fPIC -Wl,-E -Wl,-rpath,'$$ORIGIN'
+CFLAGS=-I$(LUA_DIR)/src -I$(COMPAT_DIR)/c-api -L$(OUTPUT_DIR) $(DYNLIB_CFLAGS)
 LDFLAGS=-lm
 
 all: $(OUTPUT_DIR) lua-src libs
