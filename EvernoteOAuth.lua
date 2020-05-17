@@ -105,7 +105,7 @@ local OAuth = {
     oauth = "/OAuth.action?oauth_token=",
     access = "/OAuth.action",
     token = "/oauth",
-    login = "/Login.action",
+    login = "/OAuth.action",
     tfa = "/OTCAuth.action",
   },
   postData = {
