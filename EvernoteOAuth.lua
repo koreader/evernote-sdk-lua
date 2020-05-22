@@ -260,29 +260,6 @@ function OAuth:getCookie(name)
   end
 end
 
-function OAuth:handleTwoFactor()
-  self.postData['tfa']['code'] = self.code or ('xxxxxx'):gsub("x", function()
-          return string.char(random(97, 122)) end)
-  local code, loc, content = self:loadPage("POST",
-          self.urlPath['tfa'], "jsessionid="..self.jsessionid,
-          self.postData['tfa'])
-
-  if not loc and code == 200 then
-    if self.incorrectLogin < 3 then
-      self.incorrectLogin = self.incorrectLogin + 1
-      return self:handleTwoFactor()
-    else
-      error("Incorrect two factor code")
-    end
-  end
-
-  if not loc then
-    error("Target URL was not found in the response on login")
-  end
-
-  return true
-end
-
 function OAuth:login()
   local code, _, response = self:loadPage("GET", self.urlPath['login'], nil,
           { oauth_token = self.tmpOAuthToken })
