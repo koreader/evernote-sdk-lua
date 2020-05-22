@@ -321,7 +321,7 @@ function OAuth:login()
   end
 
   if code == 302 then
-    return self:handleTwoFactor()
+    return true
   end
 
   return true
