@@ -320,10 +320,6 @@ function OAuth:login()
     error("Target URL was not found in the response on login")
   end
 
-  if code == 302 then
-    return true
-  end
-
   return true
 end
 
