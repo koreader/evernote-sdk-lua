@@ -1,10 +1,17 @@
-local logger = require('logger')
 local random = math.random
 local socket = require('socket')
 local url = require('socket.url')
 local http = require('socket.http')
 local https = require('ssl.https')
 local ltn12 = require('ltn12')
+
+-- try to use koreader's logger, if not present use print as fallback
+local ok, logger = pcall(require, 'logger')
+if not ok then
+    logger = {
+        dbg = print
+    }
+end
 --local inspect = require('inspect')
 
 --[[
@@ -307,7 +314,7 @@ function OAuth:login()
 end
 
 function OAuth:_getCsrfToken()
-  logger.dbg("Everntoe - _getCsrfToken request:")
+  logger.dbg("Evernote - _getCsrfToken request:")
   local code, _, content = self:loadPage("GET",
           self.urlPath['access'], nil, {oauth_token = self.tmpOAuthToken})
   return content
