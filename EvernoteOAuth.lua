@@ -5,13 +5,6 @@ local http = require('socket.http')
 local https = require('ssl.https')
 local ltn12 = require('ltn12')
 
--- try to use koreader's logger, if not present use print as fallback
-local ok, logger = pcall(require, 'logger')
-if not ok then
-    logger = {
-        dbg = print
-    }
-end
 --local inspect = require('inspect')
 
 --[[
@@ -107,7 +100,7 @@ local OAuth = {
   username,
   password,
   code,
-
+  logger = print,
   urlPath = {
     oauth = "/OAuth.action?oauth_token=",
     access = "/OAuth.action",
