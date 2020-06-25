@@ -1,10 +1,10 @@
-
 local random = math.random
 local socket = require('socket')
 local url = require('socket.url')
 local http = require('socket.http')
 local https = require('ssl.https')
 local ltn12 = require('ltn12')
+
 --local inspect = require('inspect')
 
 --[[
@@ -100,7 +100,7 @@ local OAuth = {
   username,
   password,
   code,
-
+  logger = print,
   urlPath = {
     oauth = "/OAuth.action?oauth_token=",
     access = "/OAuth.action",
@@ -200,11 +200,15 @@ function OAuth:loadPage(method, path, params, data)
   request['source'] = method == "POST" and ltn12.source.string(query) or nil
   request['sink'] = ltn12.sink.table(sink)
   request['headers'] = headers
+  self.logger(request)
 
   http.TIMEOUT, https.TIMEOUT = 10, 10
   local httpRequest = parsed.scheme == 'http' and http.request or https.request
   local code, headers, status = socket.skip(1, httpRequest(request))
 
+  self.logger("Evernote received response: ")
+  self.logger("Response code: ", code)
+  self.logger("Response headers: ", headers)
   -- raise error message when page cannot be loaded
   if headers == nil and code then
     error(code)
@@ -236,6 +240,7 @@ function OAuth:parseResponse(content)
 end
 
 function OAuth:getTmpOAuthToken()
+  self.logger("Evernote - getTempOAuthToken request:")
   local code, _, content = self:loadPage(
           "GET", self.urlPath['token'], nil,
           self:getTokenQueryData({ oauth_callback = self.baseUrl }))
@@ -279,6 +284,7 @@ function OAuth:login()
   self.postData['login']['targetUrl'] = target_url
   self.postData['login']['hpts'] = response:match('%("hpts"%)%.value.-"(.-)"')
   self.postData['login']['hptsh'] = response:match('%("hptsh"%)%.value.-"(.-)"')
+  self.logger("Evernote - login request:")
   local code, loc, content = self:loadPage("POST",
           self.urlPath['login'], "jsessionid="..self.jsessionid,
           self.postData['login'])
@@ -301,6 +307,7 @@ function OAuth:login()
 end
 
 function OAuth:_getCsrfToken()
+  self.logger("Evernote - _getCsrfToken request:")
   local code, _, content = self:loadPage("GET",
           self.urlPath['access'], nil, {oauth_token = self.tmpOAuthToken})
   return content
@@ -311,6 +318,7 @@ function OAuth:allowAccess()
   self.postData.access.oauth_token = self.tmpOAuthToken
   self.postData.access.oauth_callback = self.baseUrl
   self.postData.access.csrfBusterToken = content:match('"csrfBusterToken" value="(.-)"')
+  self.logger("Evernote - allowAccess request:")
   local code, loc, content = self:loadPage(
           "POST", self.urlPath['access'], nil, self.postData.access)
 
@@ -330,6 +338,7 @@ function OAuth:allowAccess()
 end
 
 function OAuth:getOAuthToken()
+  self.logger("Evernote - getOAuthToken request:")
   local code, _, content = self:loadPage("GET", self.urlPath['token'], nil,
           self:getTokenQueryData({
             oauth_token = self.tmpOAuthToken,
@@ -361,4 +370,3 @@ function OAuth:getToken()
 end
 
 return OAuth
-
